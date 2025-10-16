@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Onboarding - Purposeful Live Coaching</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .onboarding-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .step {
+            display: none;
+        }
+        
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.3s ease;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .step-indicator span {
+            color: #999;
+        }
+        
+        .step-indicator span.active {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: normal;
+        }
+        
+        .tier-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .tier-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tier-card:hover {
+            border-color: #4CAF50;
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .tier-card.selected {
+            border-color: #4CAF50;
+            background: #f0f8f0;
+        }
+        
+        .tier-card.recommended {
+            border-color: #FF9800;
+            background: #fff8e1;
+        }
+        
+        .tier-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        
+        .tier-card .price {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 10px 0;
+        }
+        
+        .tier-card .features {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .tier-card .features li {
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        
+        .tier-card .features li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .recommended-badge {
+            background: #FF9800;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+        }
+        
+        .btn-secondary {
+            background: #ddd;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #ccc;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            color: #1976D2;
+        }
+        
+        .alert-warning {
+            background: #fff3e0;
+            border-left: 4px solid #FF9800;
+            color: #F57C00;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            color: #2E7D32;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #calendly-embed {
+            min-height: 700px;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <h1>Welcome to Purposeful Live Coaching</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div class="step-indicator">
+            <span id="indicator-1" class="active">1. Assessment</span>
+            <span id="indicator-2">2. Tier Selection</span>
+            <span id="indicator-3">3. Payment</span>
+            <span id="indicator-4">4. Scheduling</span>
+            <span id="indicator-5">5. Complete</span>
+        </div>
+        
+        <!-- Step 1: Assessment -->
+        <div id="step-1" class="step active">
+            <h2>Tell Us About Yourself</h2>
+            <p>Help us understand your wellness goals and current situation.</p>
+            
+            <form id="assessmentForm">
+                <div class="form-group">
+                    <label for="assessmentText">How are you feeling? What brings you here today?</label>
+                    <textarea id="assessmentText" required placeholder="Share your thoughts, concerns, or goals..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" min="18" max="120" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Do you have any chronic conditions?</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="chronic" value="anxiety"> Anxiety</label>
+                        <label><input type="checkbox" name="chronic" value="depression"> Depression</label>
+                        <label><input type="checkbox" name="chronic" value="insomnia"> Insomnia</label>
+                        <label><input type="checkbox" name="chronic" value="chronic_pain"> Chronic Pain</label>
+                        <label><input type="checkbox" name="chronic" value="hypertension"> Hypertension</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Lifestyle habits</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="habits" value="smoking"> Smoking</label>
+                        <label><input type="checkbox" name="habits" value="alcohol"> Alcohol Use</label>
+                        <label><input type="checkbox" name="habits" value="poor_sleep"> Poor Sleep</label>
+                        <label><input type="checkbox" name="habits" value="sedentary"> Sedentary Lifestyle</label>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Step 2: Tier Selection -->
+        <div id="step-2" class="step">
+            <h2>Choose Your Coaching Tier</h2>
+            <div id="recommendationAlert"></div>
+            
+            <div class="tier-selection">
+                <div class="tier-card" data-tier="Shift Session" data-price="3500">
+                    <h3>Shift Session</h3>
+                    <div class="price">$35</div>
+                    <p>Single session</p>
+                    <ul class="features">
+                        <li>60-minute coaching session</li>
+                        <li>Personalized wellness plan</li>
+                        <li>Session recording</li>
+                        <li>Follow-up email</li>
+                    </ul>
+                </div>
+                
+                <div class="tier-card" data-tier="Clarity+" data-price="7500">
+                    <h3>Clarity+</h3>
+                    <div class="price">$75<span style="font-size: 16px;">/mo</span></div>
+                    <p>Monthly subscription</p>
+                    <ul class="features">
+                        <li>2 sessions per month</li>
+                        <li>Priority scheduling</li>
+                        <li>WhatsApp support</li>
+                        <li>Progress tracking</li>
+                        <li>Resource library access</li>
+                    </ul>
+                </div>
+                
+                <div class="tier-card" data-tier="Mastery" data-price="19500">
+                    <h3>Mastery</h3>
+                    <div class="price">$195<span style="font-size: 16px;">/mo</span></div>
+                    <p>Premium subscription</p>
+                    <ul class="features">
+                        <li>4 sessions per month</li>
+                        <li>24/7 crisis support</li>
+                        <li>Personalized action plans</li>
+                        <li>Direct coach access</li>
+                        <li>All Clarity+ features</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+                <button class="btn btn-primary" onclick="proceedToPayment()" id="tierContinueBtn" disabled>Continue to Payment</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Payment -->
+        <div id="step-3" class="step">
+            <h2>Complete Your Payment</h2>
+            <div class="alert alert-info">
+                <strong>Selected Tier:</strong> <span id="selectedTierDisplay"></span><br>
+                <strong>Amount:</strong> $<span id="selectedPriceDisplay"></span>
+            </div>
+            
+            <div id="paymentLoading" class="loading">
+                <div class="spinner"></div>
+                <p>Setting up secure payment...</p>
+            </div>
+            
+            <div id="paymentForm" style="display: none;">
+                <div id="stripe-payment-element"></div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+                    <button class="btn btn-primary" onclick="submitPayment()" id="paymentSubmitBtn">Complete Payment</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 4: Scheduling -->
+        <div id="step-4" class="step">
+            <h2>Schedule Your First Session</h2>
+            <div class="alert alert-success">
+                Payment successful! Now let's schedule your first coaching session.
+            </div>
+            
+            <div id="calendly-embed"></div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="goToStep(5)">I've Scheduled My Session</button>
+            </div>
+        </div>
+        
+        <!-- Step 5: Complete -->
+        <div id="step-5" class="step">
+            <div class="alert alert-success">
+                <h2>🎉 Welcome to Purposeful Live Coaching!</h2>
+                <p>Your onboarding is complete. We're excited to begin this journey with you.</p>
+            </div>
+            
+            <div style="margin: 30px 0;">
+                <h3>What's Next?</h3>
+                <ul style="line-height: 2;">
+                    <li>✓ You'll receive a confirmation email shortly</li>
+                    <li>✓ Check your WhatsApp for appointment reminders</li>
+                    <li>✓ Your Zoom link will be sent 24 hours before your session</li>
+                    <li>✓ Access your dashboard to view appointments and progress</li>
+                </ul>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="window.location.href='/client/dashboard.html'">Go to Dashboard</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        // Configuration
+        const API_BASE_URL = 'https://zmhqivcgz979.manus.space/api';
+        let authToken = localStorage.getItem('jwt_token');
+        let currentStep = 1;
+        let assessmentResults = null;
+        let selectedTier = null;
+        let selectedPrice = null;
+        let stripeClientSecret = null;
+        let stripe = null;
+        let elements = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!authToken) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // Initialize Stripe
+            stripe = Stripe('pk_test_your_publishable_key'); // Replace with your Stripe publishable key
+            
+            // Start onboarding
+            startOnboarding();
+            
+            // Setup tier selection
+            setupTierSelection();
+            
+            // Setup assessment form
+            document.getElementById('assessmentForm').addEventListener('submit', handleAssessmentSubmit);
+        });
+        
+        async function startOnboarding() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/onboarding/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to start onboarding');
+                
+                const data = await response.json();
+                console.log('Onboarding started:', data);
+            } catch (error) {
+                console.error('Error starting onboarding:', error);
+                alert('Failed to start onboarding. Please try again.');
+            }
+        }
+        
+        async function handleAssessmentSubmit(e) {
+            e.preventDefault();
+            
+            const text = document.getElementById('assessmentText').value;
+            const age = parseInt(document.getElementById('age').value);
+            
+            const chronic = Array.from(document.querySelectorAll('input[name="chronic"]:checked'))
+                .map(cb => cb.value);
+            
+            const habits = Array.from(document.querySelectorAll('input[name="habits"]:checked'))
+                .map(cb => cb.value);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/onboarding/assessment`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text, age, chronic, habits })
+                });
+                
+                if (!response.ok) throw new Error('Assessment failed');
+                
+                assessmentResults = await response.json();
+                console.log('Assessment results:', assessmentResults);
+                
+                // Show recommended tier
+                showRecommendedTier(assessmentResults.recommended_tier);
+                
+                goToStep(2);
+            } catch (error) {
+                console.error('Error submitting assessment:', error);
+                alert('Failed to process assessment. Please try again.');
+            }
+        }
+        
+        function showRecommendedTier(recommendedTier) {
+            const alert = document.getElementById('recommendationAlert');
+            alert.innerHTML = `
+                <div class="alert alert-info">
+                    <strong>Based on your assessment, we recommend:</strong> ${recommendedTier}
+                </div>
+            `;
+            
+            // Mark recommended tier
+            document.querySelectorAll('.tier-card').forEach(card => {
+                if (card.dataset.tier === recommendedTier) {
+                    card.classList.add('recommended');
+                    card.innerHTML = `<span class="recommended-badge">Recommended</span>` + card.innerHTML;
+                }
+            });
+        }
+        
+        function setupTierSelection() {
+            document.querySelectorAll('.tier-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    
+                    selectedTier = card.dataset.tier;
+                    selectedPrice = parseInt(card.dataset.price);
+                    
+                    document.getElementById('tierContinueBtn').disabled = false;
+                });
+            });
+        }
+        
+        async function proceedToPayment() {
+            if (!selectedTier) {
+                alert('Please select a tier');
+                return;
+            }
+            
+            goToStep(3);
+            
+            // Update display
+            document.getElementById('selectedTierDisplay').textContent = selectedTier;
+            document.getElementById('selectedPriceDisplay').textContent = (selectedPrice / 100).toFixed(2);
+            
+            // Create payment intent
+            try {
+                const response = await fetch(`${API_BASE_URL}/onboarding/payment/create-intent`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tier: selectedTier,
+                        payment_type: selectedTier === 'Shift Session' ? 'one_time' : 'subscription'
+                    })
+                });
+                
+                if (!response.ok) throw new Error('Failed to create payment intent');
+                
+                const data = await response.json();
+                stripeClientSecret = data.client_secret;
+                
+                // Setup Stripe Elements
+                elements = stripe.elements({ clientSecret: stripeClientSecret });
+                const paymentElement = elements.create('payment');
+                paymentElement.mount('#stripe-payment-element');
+                
+                document.getElementById('paymentLoading').style.display = 'none';
+                document.getElementById('paymentForm').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error creating payment intent:', error);
+                alert('Failed to setup payment. Please try again.');
+            }
+        }
+        
+        async function submitPayment() {
+            const submitBtn = document.getElementById('paymentSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            
+            try {
+                const { error } = await stripe.confirmPayment({
+                    elements,
+                    confirmParams: {
+                        return_url: window.location.origin + '/onboarding.html?payment=success'
+                    },
+                    redirect: 'if_required'
+                });
+                
+                if (error) {
+                    throw new Error(error.message);
+                }
+                
+                // Payment successful, load scheduling
+                await loadScheduling();
+                goToStep(4);
+                
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Payment failed: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Complete Payment';
+            }
+        }
+        
+        async function loadScheduling() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/onboarding/scheduling/get-link`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to get scheduling link');
+                
+                const data = await response.json();
+                
+                // Load Calendly widget
+                const script = document.createElement('script');
+                script.src = 'https://assets.calendly.com/assets/external/widget.js';
+                script.async = true;
+                document.body.appendChild(script);
+                
+                script.onload = () => {
+                    Calendly.initInlineWidget({
+                        url: data.scheduling_url,
+                        parentElement: document.getElementById('calendly-embed'),
+                        prefill: {},
+                        utm: {}
+                    });
+                };
+                
+            } catch (error) {
+                console.error('Error loading scheduling:', error);
+                alert('Failed to load scheduling. Please contact support.');
+            }
+        }
+        
+        function goToStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            
+            // Show target step
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            // Update progress
+            const progress = (step / 5) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Update indicators
+            document.querySelectorAll('.step-indicator span').forEach((span, index) => {
+                if (index < step) {
+                    span.classList.add('active');
+                } else {
+                    span.classList.remove('active');
+                }
+            });
+            
+            currentStep = step;
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
+
