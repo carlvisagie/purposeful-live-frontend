@@ -62,7 +62,10 @@ export const PRODUCTS = {
     name: "AI Essential",
     description: "24/7 AI coaching support with unlimited check-ins and crisis detection",
     priceMonthly: 4900, // $49 in cents
-    stripePriceId: process.env.STRIPE_PRICE_AI_ESSENTIAL_MONTHLY || "",
+    priceYearly: 49000, // $490 in cents (save $98/year)
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_AI_ESSENTIAL_MONTHLY || "",
+    stripePriceIdYearly: process.env.STRIPE_PRICE_AI_ESSENTIAL_YEARLY || "",
+    stripePriceIdYearlySplit: process.env.STRIPE_PRICE_AI_ESSENTIAL_YEARLY_SPLIT || "", // 2 payments of $245
     features: [
       "24/7 AI coaching chat",
       "Unlimited daily check-ins",
@@ -71,6 +74,11 @@ export const PRODUCTS = {
       "Progress visualization",
       "Email support"
     ],
+    splitPayment: {
+      enabled: true,
+      installments: 2,
+      amount: 24500 // $245 per payment (yearly only)
+    },
     category: "ai" as const,
     hidden: true // Hidden until activated by coach
   },
@@ -79,7 +87,10 @@ export const PRODUCTS = {
     name: "AI Growth",
     description: "Advanced AI coaching with personalized insights and monthly human coach check-ins",
     priceMonthly: 7900, // $79 in cents
-    stripePriceId: process.env.STRIPE_PRICE_AI_GROWTH_MONTHLY || "",
+    priceYearly: 79000, // $790 in cents (save $158/year)
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_AI_GROWTH_MONTHLY || "",
+    stripePriceIdYearly: process.env.STRIPE_PRICE_AI_GROWTH_YEARLY || "",
+    stripePriceIdYearlySplit: process.env.STRIPE_PRICE_AI_GROWTH_YEARLY_SPLIT || "", // 2 payments of $395
     features: [
       "Everything in AI Essential",
       "Advanced pattern detection",
@@ -88,6 +99,11 @@ export const PRODUCTS = {
       "Priority crisis escalation",
       "Weekly progress reports"
     ],
+    splitPayment: {
+      enabled: true,
+      installments: 2,
+      amount: 39500 // $395 per payment (yearly only)
+    },
     category: "ai" as const,
     featured: true,
     hidden: true // Hidden until activated by coach
@@ -97,7 +113,10 @@ export const PRODUCTS = {
     name: "AI Transformation",
     description: "Premium AI coaching with bi-weekly human sessions and custom goal tracking",
     priceMonthly: 9900, // $99 in cents
-    stripePriceId: process.env.STRIPE_PRICE_AI_TRANSFORMATION_MONTHLY || "",
+    priceYearly: 99000, // $990 in cents (save $198/year)
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_AI_TRANSFORMATION_MONTHLY || "",
+    stripePriceIdYearly: process.env.STRIPE_PRICE_AI_TRANSFORMATION_YEARLY || "",
+    stripePriceIdYearlySplit: process.env.STRIPE_PRICE_AI_TRANSFORMATION_YEARLY_SPLIT || "", // 2 payments of $495
     features: [
       "Everything in AI Growth",
       "Bi-weekly human coach sessions",
@@ -106,6 +125,11 @@ export const PRODUCTS = {
       "Family support resources",
       "Lifetime access to insights"
     ],
+    splitPayment: {
+      enabled: true,
+      installments: 2,
+      amount: 49500 // $495 per payment (yearly only)
+    },
     category: "ai" as const,
     hidden: true // Hidden until activated by coach
   }
@@ -154,4 +178,22 @@ export function getVisibleAIProducts(aiTierEnabled: boolean = false) {
  */
 export function getEnterpriseProducts() {
   return Object.values(PRODUCTS).filter(p => p.category === 'enterprise');
+}
+
+
+/**
+ * Check if product supports split payments (yearly only for AI products)
+ */
+export function supportsSplitPayment(productId: ProductId): boolean {
+  const product = PRODUCTS[productId];
+  return 'splitPayment' in product && product.splitPayment?.enabled === true;
+}
+
+/**
+ * Get split payment details for a product
+ */
+export function getSplitPaymentDetails(productId: ProductId) {
+  const product = PRODUCTS[productId];
+  if (!('splitPayment' in product)) return null;
+  return product.splitPayment;
 }

@@ -1219,3 +1219,54 @@
 - [ ] Progress tracking against client goals
 - [ ] Flagged concerns for next session
 - [ ] Coach performance feedback
+
+
+## $1 Introductory Session System (Research-Backed Conversion Optimization)
+
+### Session Structure (20-25 min based on conversion research)
+- [ ] $1 intro session booking flow with Stripe payment
+- [ ] 20-25 minute session duration (optimal for breakthrough moment)
+- [ ] Automated confirmation email with prep questions
+- [ ] Calendar integration for scheduling
+
+### High-Conversion Script (40-60% conversion target)
+- [ ] Phase 1: Acknowledge Pain (2 min) - Reflect client's stated struggle
+- [ ] Phase 2: Demonstrate Insight (10 min) - AI reveals pattern they didn't see
+- [ ] Phase 3: Create Hope (10 min) - Specific transformation example
+- [ ] Phase 4: Clear CTA (3 min) - Transition to $49 session offer
+- [ ] AI real-time guidance for coach during session
+- [ ] Script variations based on client's primary concern
+
+### Session Tier Differentiation
+- [ ] $49: Single 60-min session, one focus area, action plan
+- [ ] $99: 60-min session + 2-week AI coach access + follow-up check-in
+- [ ] $149: 60-min session + 30-day AI coach + weekly check-ins + custom roadmap
+
+### Automated Follow-Up System (48-hour window)
+- [ ] Email sequence: 2 hours, 24 hours, 48 hours post-session
+- [ ] Personalized recap of session insights
+- [ ] Social proof (similar client success stories)
+- [ ] Limited-time booking incentive
+- [ ] One-click booking link for next session
+
+### Payment Integration
+- [ ] Stripe checkout for all session tiers
+- [ ] Upsell flow ($1 → $49 → $99 → $149)
+- [ ] Package deals (3-session, 6-session bundles)
+- [ ] Refund policy and cancellation handling
+
+### Conversion Tracking & Optimization
+- [ ] Track $1 → $49 conversion rate
+- [ ] A/B test script variations
+- [ ] Session recording and review system
+- [ ] Coach performance analytics
+- [ ] Client feedback collection
+
+
+## Split Payment Setup
+- [x] AI Essential yearly: 2-payment option ($245 x 2)
+- [x] AI Growth yearly: 2-payment option ($395 x 2)
+- [x] AI Transformation yearly: 2-payment option ($495 x 2)
+- [x] Stripe subscription configuration for split payments
+- [ ] Payment plan selection UI on subscription page
+- [ ] Automated payment reminder emails

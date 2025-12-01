@@ -89,6 +89,8 @@ export const stripeRouter = router({
     .input(
       z.object({
         productId: z.string(),
+        billingPeriod: z.enum(['monthly', 'yearly']).optional().default('monthly'),
+        splitPayment: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -98,7 +100,22 @@ export const stripeRouter = router({
         throw new Error("Product not found");
       }
       
-      if (!product.stripePriceId) {
+      // Determine which price ID to use based on billing period and split payment option
+      let priceId: string | undefined;
+      
+      if ('stripePriceIdMonthly' in product && 'stripePriceIdYearly' in product) {
+        // AI products with monthly/yearly options
+        if (input.billingPeriod === 'yearly') {
+          priceId = input.splitPayment ? product.stripePriceIdYearlySplit : product.stripePriceIdYearly;
+        } else {
+          priceId = product.stripePriceIdMonthly;
+        }
+      } else if ('stripePriceId' in product) {
+        // Enterprise products with single price ID
+        priceId = product.stripePriceId;
+      }
+      
+      if (!priceId) {
         throw new Error("Product not available for purchase. Please contact sales.");
       }
 
@@ -109,7 +126,7 @@ export const stripeRouter = router({
         payment_method_types: ["card"],
         line_items: [
           {
-            price: product.stripePriceId,
+            price: priceId,
             quantity: 1,
           },
         ],
