@@ -1,62 +1,13 @@
 /**
  * Stripe Products Configuration
- * Defines coaching packages and pricing for the Purposeful Live Coaching platform
+ * Individual Coaching Site - AI Coaching Tiers + Session Payments ONLY
+ * NO ENTERPRISE CONTENT
  */
 
+/**
+ * AI Coaching Subscription Products
+ */
 export const PRODUCTS = {
-  STARTER: {
-    id: "starter",
-    name: "Starter Package",
-    description: "Perfect for small teams and pilot programs - Up to 50 users with core emotional tracking",
-    priceMonthly: 250000, // $2,500 in cents
-    stripePriceId: process.env.STRIPE_PRICE_STARTER_MONTHLY || "",
-    features: [
-      "Up to 50 users",
-      "Core emotional tracking",
-      "Monthly reporting",
-      "Email support",
-      "Basic AI insights"
-    ],
-    category: "enterprise" as const
-  },
-  PROFESSIONAL: {
-    id: "professional",
-    name: "Professional Package",
-    description: "Comprehensive solution for growing organizations - Up to 250 users with advanced analytics",
-    priceMonthly: 750000, // $7,500 in cents
-    stripePriceId: process.env.STRIPE_PRICE_PROFESSIONAL_MONTHLY || "",
-    features: [
-      "Up to 250 users",
-      "Advanced analytics",
-      "Weekly reporting",
-      "Priority support",
-      "Full AI insights",
-      "Custom integrations",
-      "Dedicated coach"
-    ],
-    featured: true,
-    category: "enterprise" as const
-  },
-  ENTERPRISE: {
-    id: "enterprise",
-    name: "Enterprise Package",
-    description: "Tailored solutions for large organizations - Unlimited users with white-label options",
-    priceMonthly: 0, // Custom pricing - contact sales
-    stripePriceId: "", // No Stripe price ID - requires custom quote
-    features: [
-      "Unlimited users",
-      "White-label option",
-      "Real-time dashboards",
-      "24/7 support",
-      "Full customization",
-      "API access",
-      "Dedicated team",
-      "Insurance integration"
-    ],
-    contactSales: true,
-    category: "enterprise" as const
-  },
-  // AI-First Coaching Tier (Hidden until activated)
   AI_ESSENTIAL: {
     id: "ai_essential",
     name: "AI Essential",
@@ -79,8 +30,7 @@ export const PRODUCTS = {
       installments: 2,
       amount: 24500 // $245 per payment (yearly only)
     },
-    category: "ai" as const,
-    hidden: true // Hidden until activated by coach
+    category: "ai" as const
   },
   AI_GROWTH: {
     id: "ai_growth",
@@ -105,8 +55,7 @@ export const PRODUCTS = {
       amount: 39500 // $395 per payment (yearly only)
     },
     category: "ai" as const,
-    featured: true,
-    hidden: true // Hidden until activated by coach
+    featured: true
   },
   AI_TRANSFORMATION: {
     id: "ai_transformation",
@@ -130,8 +79,7 @@ export const PRODUCTS = {
       installments: 2,
       amount: 49500 // $495 per payment (yearly only)
     },
-    category: "ai" as const,
-    hidden: true // Hidden until activated by coach
+    category: "ai" as const
   }
 } as const;
 
@@ -152,36 +100,6 @@ export function getAllProducts() {
 }
 
 /**
- * Get purchasable products (excludes enterprise/contact sales)
- */
-export function getPurchasableProducts() {
-  return Object.values(PRODUCTS).filter(p => !('contactSales' in p) || !p.contactSales);
-}
-
-/**
- * Get AI coaching products only
- */
-export function getAIProducts() {
-  return Object.values(PRODUCTS).filter(p => p.category === 'ai');
-}
-
-/**
- * Get visible AI products (respects hidden flag)
- */
-export function getVisibleAIProducts(aiTierEnabled: boolean = false) {
-  if (!aiTierEnabled) return [];
-  return Object.values(PRODUCTS).filter(p => p.category === 'ai' && (!('hidden' in p) || !p.hidden));
-}
-
-/**
- * Get enterprise products only
- */
-export function getEnterpriseProducts() {
-  return Object.values(PRODUCTS).filter(p => p.category === 'enterprise');
-}
-
-
-/**
  * Check if product supports split payments (yearly only for AI products)
  */
 export function supportsSplitPayment(productId: ProductId): boolean {
@@ -197,7 +115,6 @@ export function getSplitPaymentDetails(productId: ProductId) {
   if (!('splitPayment' in product)) return null;
   return product.splitPayment;
 }
-
 
 /**
  * Session Payment Products (One-time payments for coaching sessions)

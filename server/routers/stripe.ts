@@ -110,9 +110,6 @@ export const stripeRouter = router({
         } else {
           priceId = product.stripePriceIdMonthly;
         }
-      } else if ('stripePriceId' in product) {
-        // Enterprise products with single price ID
-        priceId = product.stripePriceId;
       }
       
       if (!priceId) {
