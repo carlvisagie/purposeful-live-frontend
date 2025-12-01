@@ -197,3 +197,58 @@ export function getSplitPaymentDetails(productId: ProductId) {
   if (!('splitPayment' in product)) return null;
   return product.splitPayment;
 }
+
+
+/**
+ * Session Payment Products (One-time payments for coaching sessions)
+ */
+export const SESSION_PRODUCTS = [
+  {
+    id: 'intro_session',
+    name: '$1 Intro Session',
+    description: '20-minute clarity session with personalized insight',
+    price: 100, // $1.00 in cents
+    duration: 20,
+    stripePriceId: process.env.STRIPE_INTRO_SESSION_PRICE_ID || 'price_intro_session' // TODO: Create in Stripe
+  },
+  {
+    id: 'foundation_session',
+    name: 'Foundation Session',
+    description: '45-minute 1-on-1 coaching session with action plan',
+    price: 4900, // $49.00 in cents
+    duration: 45,
+    stripePriceId: process.env.STRIPE_FOUNDATION_SESSION_PRICE_ID || 'price_foundation_session' // TODO: Create in Stripe
+  },
+  {
+    id: 'growth_session',
+    name: 'Growth Session',
+    description: '60-minute intensive session with 30-day roadmap',
+    price: 9900, // $99.00 in cents
+    duration: 60,
+    stripePriceId: process.env.STRIPE_GROWTH_SESSION_PRICE_ID || 'price_growth_session' // TODO: Create in Stripe
+  },
+  {
+    id: 'transformation_session',
+    name: 'Transformation Session',
+    description: '90-minute breakthrough session with extended support',
+    price: 14900, // $149.00 in cents
+    duration: 90,
+    stripePriceId: process.env.STRIPE_TRANSFORMATION_SESSION_PRICE_ID || 'price_transformation_session' // TODO: Create in Stripe
+  }
+] as const;
+
+export type SessionProductId = typeof SESSION_PRODUCTS[number]['id'];
+
+/**
+ * Get session product by ID
+ */
+export function getSessionProduct(sessionId: string) {
+  return SESSION_PRODUCTS.find(p => p.id === sessionId);
+}
+
+/**
+ * Get all session products
+ */
+export function getAllSessionProducts() {
+  return SESSION_PRODUCTS;
+}

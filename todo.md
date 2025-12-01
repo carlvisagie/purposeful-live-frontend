@@ -1270,3 +1270,19 @@
 - [x] Stripe subscription configuration for split payments
 - [ ] Payment plan selection UI on subscription page
 - [ ] Automated payment reminder emails
+
+
+## REVENUE-CRITICAL (Must Complete to Go Live)
+- [x] Build separate $1 intro session landing page (/intro)
+- [x] Fix main page pricing (change from subscriptions to per-session: $49/$99/$149)
+- [x] Integrate Calendly for session booking with coaches (TODO: Add actual Calendly URLs)
+- [ ] Connect Stripe payment for $1 intro session
+- [ ] Connect Stripe payment for $49/$99/$149 sessions
+- [ ] Wire AI coach frontend to backend (make chat actually work)
+- [ ] Test end-to-end: $1 intro booking → payment → calendar → confirmation
+- [ ] Test end-to-end: $49/$99/$149 session booking → payment → calendar → confirmation
+
+## BLOCKERS (Need User Action)
+- [ ] Create Calendly account and event types ($1 intro, $49 foundation, $99 growth, $149 transformation)
+- [ ] Update BookSession.tsx with actual Calendly URLs
+- [ ] Verify Calendly payment integration with Stripe

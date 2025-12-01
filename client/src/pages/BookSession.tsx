@@ -1,323 +1,201 @@
-import { useState } from "react";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { Calendar, Clock, CheckCircle2 } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InlineWidget } from 'react-calendly';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Calendar, Clock, DollarSign } from 'lucide-react';
+import { Link } from 'wouter';
+import { useState } from 'react';
+
+/**
+ * Session Booking Page
+ * 
+ * Calendly integration for booking sessions with coaches.
+ * Research-backed: Embedded calendar reduces friction vs external redirect.
+ * 
+ * Session Tiers:
+ * - $1 Intro (20 min) - Tripwire conversion offer
+ * - $49 Foundation (45 min) - Entry-level coaching
+ * - $99 Growth (60 min) - Most popular tier
+ * - $149 Transformation (90 min) - Premium tier
+ * 
+ * TODO: Replace placeholder Calendly URLs with actual coach calendars
+ */
 
 const SESSION_TYPES = [
-  { value: "initial", label: "Initial Consultation (60 min)", duration: 60 },
-  { value: "follow-up", label: "Follow-up Session (45 min)", duration: 45 },
-  { value: "check-in", label: "Quick Check-in (30 min)", duration: 30 },
+  {
+    id: 'intro',
+    name: '$1 Intro Session',
+    price: 1,
+    duration: 20,
+    description: 'Get clarity on your biggest challenge. Zero pressure, maximum insight.',
+    calendlyUrl: 'https://calendly.com/purposefullive/intro-session', // TODO: Replace with actual URL
+    features: ['20-minute clarity session', 'Personalized insight', 'No commitment required']
+  },
+  {
+    id: 'foundation',
+    name: 'Foundation Session',
+    price: 49,
+    duration: 45,
+    description: 'Perfect for getting started with professional coaching and building momentum.',
+    calendlyUrl: 'https://calendly.com/purposefullive/foundation-session', // TODO: Replace with actual URL
+    features: ['45-minute 1-on-1 session', 'Personalized action plan', 'Email follow-up support', 'Session recording access']
+  },
+  {
+    id: 'growth',
+    name: 'Growth Session',
+    price: 99,
+    duration: 60,
+    description: 'Deep-dive sessions with comprehensive support and accountability.',
+    calendlyUrl: 'https://calendly.com/purposefullive/growth-session', // TODO: Replace with actual URL
+    popular: true,
+    features: ['60-minute intensive session', 'Personalized 30-day roadmap', '2 weeks of text support', 'Progress tracking tools', 'Session recording + transcript']
+  },
+  {
+    id: 'transformation',
+    name: 'Transformation Session',
+    price: 149,
+    duration: 90,
+    description: 'Premium coaching experience with extended support and rapid breakthrough results.',
+    calendlyUrl: 'https://calendly.com/purposefullive/transformation-session', // TODO: Replace with actual URL
+    features: ['90-minute breakthrough session', 'Custom transformation plan', '30 days of direct coach access', 'Weekly check-in calls', 'Priority scheduling', 'Lifetime session access']
+  }
 ];
 
 export default function BookSession() {
-  const [coachId] = useState(1); // TODO: Get from context or props
-  const [clientId] = useState(1); // TODO: Get from auth context
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [sessionType, setSessionType] = useState("follow-up");
-  const [notes, setNotes] = useState("");
-  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<string | null>(null);
 
-  // Get current month for calendar
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-
-  // Get session duration based on type
-  const duration = SESSION_TYPES.find(t => t.value === sessionType)?.duration || 45;
-
-  // Fetch available slots when date is selected
-  const { data: slotsData, isLoading: loadingSlots } = trpc.scheduling.getAvailableSlots.useQuery(
-    {
-      coachId,
-      date: selectedDate!,
-      duration,
-    },
-    {
-      enabled: selectedDate !== null,
-    }
-  );
-
-  // Book session mutation
-  const bookSession = trpc.scheduling.bookSession.useMutation({
-    onSuccess: () => {
-      setShowConfirmation(true);
-      setSelectedDate(null);
-      setSelectedSlot(null);
-      setNotes("");
-    },
-    onError: (error) => {
-      toast.error(`Failed to book session: ${error.message}`);
-    },
-  });
-
-  const handleBookSession = () => {
-    if (!selectedSlot) {
-      toast.error("Please select a time slot");
-      return;
-    }
-
-    bookSession.mutate({
-      coachId,
-      clientId,
-      scheduledDate: new Date(selectedSlot),
-      duration,
-      sessionType,
-      notes,
-    });
-  };
-
-  // Generate calendar days for current month
-  const generateCalendarDays = () => {
-    const year = currentMonth.getFullYear();
-    const month = currentMonth.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-
-    const days: (Date | null)[] = [];
-
-    // Add empty slots for days before month starts
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-
-    // Add days of month
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day));
-    }
-
-    return days;
-  };
-
-  const calendarDays = generateCalendarDays();
-
-  const previousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-  };
-
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-  };
-
-  const isToday = (date: Date | null) => {
-    if (!date) return false;
-    const today = new Date();
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
-
-  const isPast = (date: Date | null) => {
-    if (!date) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
-
-  const isSelected = (date: Date | null) => {
-    if (!date || !selectedDate) return false;
-    return (
-      date.getDate() === selectedDate.getDate() &&
-      date.getMonth() === selectedDate.getMonth() &&
-      date.getFullYear() === selectedDate.getFullYear()
-    );
-  };
+  const selectedType = SESSION_TYPES.find(t => t.id === selectedSession);
 
   return (
-    <div className="container max-w-5xl py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Book a Session</h1>
-        <p className="text-muted-foreground">
-          Select a date and time that works for you
-        </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-[1fr,400px]">
-        {/* Calendar */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Select a Date
-            </CardTitle>
-            <CardDescription>
-              Choose a date to see available time slots
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* Month Navigation */}
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="outline" size="sm" onClick={previousMonth}>
-                ← Previous
-              </Button>
-              <h3 className="font-semibold">
-                {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-              </h3>
-              <Button variant="outline" size="sm" onClick={nextMonth}>
-                Next →
-              </Button>
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-2">
-              {/* Day headers */}
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
-                <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
-                  {day}
-                </div>
-              ))}
-
-              {/* Calendar days */}
-              {calendarDays.map((date, index) => (
-                <button
-                  key={index}
-                  onClick={() => date && !isPast(date) && setSelectedDate(date)}
-                  disabled={!date || isPast(date)}
-                  className={`
-                    aspect-square p-2 text-sm rounded-md transition-colors
-                    ${!date ? "invisible" : ""}
-                    ${isPast(date) ? "text-muted-foreground cursor-not-allowed" : "hover:bg-accent"}
-                    ${isToday(date) ? "border-2 border-primary" : "border border-border"}
-                    ${isSelected(date) ? "bg-primary text-primary-foreground" : ""}
-                  `}
-                >
-                  {date?.getDate()}
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Booking Details */}
-        <div className="space-y-6">
-          {/* Session Type */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Session Type</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Select value={sessionType} onValueChange={setSessionType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SESSION_TYPES.map(type => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </CardContent>
-          </Card>
-
-          {/* Available Time Slots */}
-          {selectedDate && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Clock className="h-5 w-5" />
-                  Available Times
-                </CardTitle>
-                <CardDescription>
-                  {selectedDate.toLocaleDateString("en-US", {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loadingSlots ? (
-                  <p className="text-sm text-muted-foreground">Loading available slots...</p>
-                ) : slotsData?.slots.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No available slots on this date</p>
-                ) : (
-                  <div className="grid grid-cols-2 gap-2">
-                    {slotsData?.slots.map(slot => {
-                      const slotDate = new Date(slot);
-                      const timeString = slotDate.toLocaleTimeString("en-US", {
-                        hour: "numeric",
-                        minute: "2-digit",
-                        hour12: true,
-                      });
-
-                      return (
-                        <Button
-                          key={slot}
-                          variant={selectedSlot === slot ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setSelectedSlot(slot)}
-                          className="justify-start"
-                        >
-                          {timeString}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Notes */}
-          {selectedSlot && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Additional Notes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="Any specific topics or concerns you'd like to discuss?"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={3}
-                />
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Book Button */}
-          {selectedSlot && (
-            <Button
-              onClick={handleBookSession}
-              disabled={bookSession.isPending}
-              className="w-full"
-              size="lg"
-            >
-              Book Session
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-4">
+          <Link href="/individual-coaching">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
             </Button>
-          )}
+          </Link>
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
-      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <DialogContent>
-          <DialogHeader>
-            <div className="mx-auto mb-4">
-              <CheckCircle2 className="h-12 w-12 text-green-500" />
+      <div className="container mx-auto px-4 py-12">
+        {!selectedSession ? (
+          <>
+            {/* Session Selection */}
+            <div className="text-center mb-12">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                Choose Your Session
+              </h1>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Select the coaching session that best fits your needs. All sessions include personalized guidance and actionable insights.
+              </p>
             </div>
-            <DialogTitle className="text-center">Session Booked!</DialogTitle>
-            <DialogDescription className="text-center">
-              Your session has been successfully scheduled. You'll receive a confirmation email shortly.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="sm:justify-center">
-            <Button onClick={() => setShowConfirmation(false)}>
-              Done
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+              {SESSION_TYPES.map((session) => (
+                <Card 
+                  key={session.id}
+                  className={`relative cursor-pointer transition-all hover:shadow-xl ${
+                    session.popular ? 'border-2 border-rose-500 scale-105' : 'border border-gray-200'
+                  }`}
+                  onClick={() => setSelectedSession(session.id)}
+                >
+                  {session.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-rose-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      MOST POPULAR
+                    </div>
+                  )}
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{session.name}</h3>
+                    <div className="flex items-baseline gap-2 mb-4">
+                      <span className="text-3xl font-bold text-gray-900">${session.price}</span>
+                      <span className="text-gray-600">/session</span>
+                    </div>
+                    
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Clock className="h-4 w-4" />
+                        <span>{session.duration} minutes</span>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-6">{session.description}</p>
+
+                    <Button 
+                      className={`w-full ${session.popular ? 'bg-rose-500 hover:bg-rose-600' : 'bg-gray-900 hover:bg-gray-800'}`}
+                    >
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Book Now
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Calendly Booking Widget */}
+            <div className="max-w-4xl mx-auto">
+              <div className="mb-8">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setSelectedSession(null)}
+                  className="mb-4"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Change Session Type
+                </Button>
+                
+                <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        {selectedType?.name}
+                      </h2>
+                      <p className="text-gray-600 mb-4">{selectedType?.description}</p>
+                      
+                      <div className="flex items-center gap-6 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          <span>{selectedType?.duration} minutes</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4" />
+                          <span>${selectedType?.price}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Embedded Calendly Widget */}
+              <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+                <InlineWidget
+                  url={selectedType?.calendlyUrl || ''}
+                  styles={{
+                    height: '700px',
+                    minWidth: '320px'
+                  }}
+                  pageSettings={{
+                    backgroundColor: 'ffffff',
+                    hideEventTypeDetails: false,
+                    hideLandingPageDetails: false,
+                    primaryColor: 'f43f5e',
+                    textColor: '111827'
+                  }}
+                />
+              </div>
+
+              {/* Trust Elements */}
+              <div className="mt-8 text-center text-sm text-gray-600">
+                <p>🔒 Secure booking • 90-day money-back guarantee • Licensed professionals</p>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

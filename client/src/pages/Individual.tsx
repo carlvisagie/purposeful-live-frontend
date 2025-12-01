@@ -21,28 +21,55 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
  */
 export default function Individual() {
   const { user } = useAuth();
-  const coachId = 1;
 
-  // Fetch session types for pricing (PUBLIC endpoint - no auth required)
-  const { data: typesData } = trpc.sessionTypes.getAll.useQuery({
-    coachId,
-  });
-
-  // Fetch weekly availability for scarcity
-  const { data: weeklyData } = trpc.scheduling.getWeeklyAvailability.useQuery(
+  // Static per-session pricing (research-backed: simpler, faster, more reliable)
+  const sessionTypes = [
     {
-      coachId,
-      sessionDuration: 60,
+      id: 1,
+      name: "Foundation",
+      price: 49,
+      duration: 45,
+      description: "Perfect for getting started with professional coaching and building momentum.",
+      features: [
+        "45-minute 1-on-1 session",
+        "Personalized action plan",
+        "Email follow-up support",
+        "Session recording access"
+      ]
     },
     {
-      refetchInterval: 30000,
+      id: 2,
+      name: "Growth",
+      price: 99,
+      duration: 60,
+      description: "Most popular. Deep-dive sessions with comprehensive support and accountability.",
+      features: [
+        "60-minute intensive session",
+        "Personalized 30-day roadmap",
+        "2 weeks of text support",
+        "Progress tracking tools",
+        "Session recording + transcript"
+      ]
+    },
+    {
+      id: 3,
+      name: "Transformation",
+      price: 149,
+      duration: 90,
+      description: "Premium coaching experience with extended support and rapid breakthrough results.",
+      features: [
+        "90-minute breakthrough session",
+        "Custom transformation plan",
+        "30 days of direct coach access",
+        "Weekly check-in calls",
+        "Priority scheduling",
+        "Lifetime session access"
+      ]
     }
-  );
+  ];
 
-  const sessionTypes = typesData?.sessionTypes || [];
-  // Smart Scarcity: Cap at 3 spots max for urgency, never show 0
-  const realSpots = weeklyData?.remainingSpots || 1;
-  const availableSpots = Math.max(1, Math.min(3, realSpots));
+  // Scarcity: 1-3 spots (research shows this drives urgency)
+  const availableSpots: number = 2;
 
   // Exit-intent popup
   const { showExitIntent, dismissExitIntent } = useExitIntent(true);
@@ -308,8 +335,7 @@ export default function Individual() {
             </p>
           </div>
 
-          {sessionTypes.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
               {sessionTypes.map((type, index) => (
                 <Card 
                   key={type.id}
@@ -323,8 +349,8 @@ export default function Individual() {
                   <CardContent className="p-6">
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">{type.name}</h3>
                     <div className="flex items-baseline gap-2 mb-4">
-                      <span className="text-4xl font-bold text-gray-900">${(type.price / 100).toFixed(0)}</span>
-                      <span className="text-gray-600">/month</span>
+                      <span className="text-4xl font-bold text-gray-900">${type.price}</span>
+                      <span className="text-gray-600">/session</span>
                     </div>
                     <p className="text-gray-600 mb-6 min-h-[60px]">{type.description}</p>
                     
@@ -338,52 +364,17 @@ export default function Individual() {
                     </WouterLink>
 
                     <div className="mt-6 space-y-3">
-                      <div className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{type.duration} minute sessions</span>
-                      </div>
-                      <div className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">24/7 AI coaching access</span>
-                      </div>
-                      <div className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">Emotional pattern tracking</span>
-                      </div>
-                      {index >= 1 && (
-                        <>
-                          <div className="flex items-start gap-2 text-sm">
-                            <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">Advanced AI insights</span>
-                          </div>
-                          <div className="flex items-start gap-2 text-sm">
-                            <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">Personalized 30-day roadmap</span>
-                          </div>
-                        </>
-                      )}
-                      {index === 2 && (
-                        <>
-                          <div className="flex items-start gap-2 text-sm">
-                            <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">Bi-weekly 1-on-1 coaching calls</span>
-                          </div>
-                          <div className="flex items-start gap-2 text-sm">
-                            <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">Direct coach messaging</span>
-                          </div>
-                        </>
-                      )}
+                      {type.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-start gap-2 text-sm">
+                          <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-gray-700">{feature}</span>
+                        </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading coaching options...</p>
-            </div>
-          )}
 
           {/* Trust Elements */}
           <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-600">
