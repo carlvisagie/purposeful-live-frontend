@@ -1,11 +1,11 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d53ffca5-fc3a-4f6c-ad08-d42726022719",
-  "prevId": "7e7b7f30-15c1-4dbe-b06c-05fb9d51fa85",
+  "id": "bd56e293-830a-4d21-8e1c-12c3ca9c95f8",
+  "prevId": "effc673d-ab65-4dcc-b6a5-d03533199c9a",
   "tables": {
-    "analyticsEvents": {
-      "name": "analyticsEvents",
+    "aiInsights": {
+      "name": "aiInsights",
       "columns": {
         "id": {
           "name": "id",
@@ -14,33 +14,64 @@
           "notNull": true,
           "autoincrement": true
         },
-        "userId": {
-          "name": "userId",
+        "clientId": {
+          "name": "clientId",
           "type": "int",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
-        "eventType": {
-          "name": "eventType",
+        "insightDate": {
+          "name": "insightDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "insightType": {
+          "name": "insightType",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "eventData": {
-          "name": "eventData",
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "severity": {
+          "name": "severity",
+          "type": "enum('low','medium','high','critical')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'low'"
+        },
+        "actionable": {
+          "name": "actionable",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "sessionId": {
-          "name": "sessionId",
-          "type": "varchar(255)",
+        "isRead": {
+          "name": "isRead",
+          "type": "enum('true','false')",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'false'"
         },
         "createdAt": {
           "name": "createdAt",
@@ -52,10 +83,151 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "aiInsights_clientId_clients_id_fk": {
+          "name": "aiInsights_clientId_clients_id_fk",
+          "tableFrom": "aiInsights",
+          "tableTo": "clients",
+          "columnsFrom": [
+            "clientId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
-        "analyticsEvents_id": {
-          "name": "analyticsEvents_id",
+        "aiInsights_id": {
+          "name": "aiInsights_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "clients": {
+      "name": "clients",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "coachId": {
+          "name": "coachId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "dateOfBirth": {
+          "name": "dateOfBirth",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "goals": {
+          "name": "goals",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('active','inactive','completed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'active'"
+        },
+        "startDate": {
+          "name": "startDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "endDate": {
+          "name": "endDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "clients_coachId_coaches_id_fk": {
+          "name": "clients_coachId_coaches_id_fk",
+          "tableFrom": "clients",
+          "tableTo": "coaches",
+          "columnsFrom": [
+            "coachId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "clients_id": {
+          "name": "clients_id",
           "columns": [
             "id"
           ]
@@ -81,18 +253,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
+        "specialization": {
+          "name": "specialization",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "expertise": {
-          "name": "expertise",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "bio": {
@@ -109,36 +274,20 @@
           "notNull": false,
           "autoincrement": false
         },
-        "rating": {
-          "name": "rating",
+        "yearsExperience": {
+          "name": "yearsExperience",
           "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "availability": {
-          "name": "availability",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'medium'"
-        },
-        "coachTier": {
-          "name": "coachTier",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'basic'"
-        },
         "isActive": {
           "name": "isActive",
-          "type": "boolean",
+          "type": "enum('true','false')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": true
+          "default": "'true'"
         },
         "createdAt": {
           "name": "createdAt",
@@ -159,7 +308,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "coaches_userId_users_id_fk": {
+          "name": "coaches_userId_users_id_fk",
+          "tableFrom": "coaches",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "coaches_id": {
           "name": "coaches_id",
@@ -168,107 +331,11 @@
           ]
         }
       },
-      "uniqueConstraints": {
-        "coaches_userId_unique": {
-          "name": "coaches_userId_unique",
-          "columns": [
-            "userId"
-          ]
-        }
-      },
-      "checkConstraint": {}
-    },
-    "crisisAlerts": {
-      "name": "crisisAlerts",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "severity": {
-          "name": "severity",
-          "type": "enum('low','medium','high','critical')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "flags": {
-          "name": "flags",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "context": {
-          "name": "context",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "enum('new','acknowledged','resolved')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'new'"
-        },
-        "acknowledgedBy": {
-          "name": "acknowledgedBy",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "acknowledgedAt": {
-          "name": "acknowledgedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "resolution": {
-          "name": "resolution",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "crisisAlerts_id": {
-          "name": "crisisAlerts_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "diagnostics": {
-      "name": "diagnostics",
+    "copingStrategies": {
+      "name": "copingStrategies",
       "columns": {
         "id": {
           "name": "id",
@@ -277,363 +344,22 @@
           "notNull": true,
           "autoincrement": true
         },
-        "userId": {
-          "name": "userId",
+        "clientId": {
+          "name": "clientId",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "responses": {
-          "name": "responses",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "primaryConcerns": {
-          "name": "primaryConcerns",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "secondaryConcerns": {
-          "name": "secondaryConcerns",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "recommendedFocusAreas": {
-          "name": "recommendedFocusAreas",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "mortalityRisk": {
-          "name": "mortalityRisk",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "wellnessScore": {
-          "name": "wellnessScore",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "flags": {
-          "name": "flags",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tier": {
-          "name": "tier",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "diagnostics_id": {
-          "name": "diagnostics_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "notifications": {
-      "name": "notifications",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "type": {
-          "name": "type",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "message": {
-          "name": "message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "isRead": {
-          "name": "isRead",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": false
-        },
-        "actionUrl": {
-          "name": "actionUrl",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "notifications_id": {
-          "name": "notifications_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "payments": {
-      "name": "payments",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "stripePaymentId": {
-          "name": "stripePaymentId",
+        "strategyName": {
+          "name": "strategyName",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "amount": {
-          "name": "amount",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "currency": {
-          "name": "currency",
-          "type": "varchar(3)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'usd'"
-        },
-        "status": {
-          "name": "status",
-          "type": "enum('pending','succeeded','failed','refunded')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'pending'"
-        },
-        "tier": {
-          "name": "tier",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "payments_id": {
-          "name": "payments_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "progressRecords": {
-      "name": "progressRecords",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "wellnessScore": {
-          "name": "wellnessScore",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "emotionalState": {
-          "name": "emotionalState",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "goals": {
-          "name": "goals",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "achievements": {
-          "name": "achievements",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "notes": {
-          "name": "notes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "progressRecords_id": {
-          "name": "progressRecords_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "resources": {
-      "name": "resources",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
         "description": {
           "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "type": {
-          "name": "type",
-          "type": "enum('article','video','audio','worksheet','guide')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "fileKey": {
-          "name": "fileKey",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -646,20 +372,35 @@
           "notNull": false,
           "autoincrement": false
         },
-        "tags": {
-          "name": "tags",
-          "type": "text",
+        "timesUsed": {
+          "name": "timesUsed",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "averageEffectiveness": {
+          "name": "averageEffectiveness",
+          "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
-        "isPublic": {
-          "name": "isPublic",
-          "type": "boolean",
+        "lastUsed": {
+          "name": "lastUsed",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isRecommended": {
+          "name": "isRecommended",
+          "type": "enum('true','false')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": true
+          "default": "'false'"
         },
         "createdAt": {
           "name": "createdAt",
@@ -680,10 +421,281 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "copingStrategies_clientId_clients_id_fk": {
+          "name": "copingStrategies_clientId_clients_id_fk",
+          "tableFrom": "copingStrategies",
+          "tableTo": "clients",
+          "columnsFrom": [
+            "clientId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
-        "resources_id": {
-          "name": "resources_id",
+        "copingStrategies_id": {
+          "name": "copingStrategies_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "emotionLogs": {
+      "name": "emotionLogs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "clientId": {
+          "name": "clientId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "journalEntryId": {
+          "name": "journalEntryId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "logDate": {
+          "name": "logDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "emotionType": {
+          "name": "emotionType",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "intensity": {
+          "name": "intensity",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "trigger": {
+          "name": "trigger",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "physicalSensations": {
+          "name": "physicalSensations",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "thoughts": {
+          "name": "thoughts",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "behaviors": {
+          "name": "behaviors",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "emotionLogs_clientId_clients_id_fk": {
+          "name": "emotionLogs_clientId_clients_id_fk",
+          "tableFrom": "emotionLogs",
+          "tableTo": "clients",
+          "columnsFrom": [
+            "clientId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "emotionLogs_journalEntryId_journalEntries_id_fk": {
+          "name": "emotionLogs_journalEntryId_journalEntries_id_fk",
+          "tableFrom": "emotionLogs",
+          "tableTo": "journalEntries",
+          "columnsFrom": [
+            "journalEntryId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "emotionLogs_id": {
+          "name": "emotionLogs_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "journalEntries": {
+      "name": "journalEntries",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "clientId": {
+          "name": "clientId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "entryDate": {
+          "name": "entryDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mood": {
+          "name": "mood",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "moodIntensity": {
+          "name": "moodIntensity",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "emotions": {
+          "name": "emotions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "triggers": {
+          "name": "triggers",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "copingStrategies": {
+          "name": "copingStrategies",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "copingEffectiveness": {
+          "name": "copingEffectiveness",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resilienceScore": {
+          "name": "resilienceScore",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isPrivate": {
+          "name": "isPrivate",
+          "type": "enum('true','false')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'false'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "journalEntries_clientId_clients_id_fk": {
+          "name": "journalEntries_clientId_clients_id_fk",
+          "tableFrom": "journalEntries",
+          "tableTo": "clients",
+          "columnsFrom": [
+            "clientId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "journalEntries_id": {
+          "name": "journalEntries_id",
           "columns": [
             "id"
           ]
@@ -702,13 +714,6 @@
           "notNull": true,
           "autoincrement": true
         },
-        "userId": {
-          "name": "userId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "coachId": {
           "name": "coachId",
           "type": "int",
@@ -716,15 +721,15 @@
           "notNull": true,
           "autoincrement": false
         },
-        "startTime": {
-          "name": "startTime",
-          "type": "timestamp",
+        "clientId": {
+          "name": "clientId",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "endTime": {
-          "name": "endTime",
+        "scheduledDate": {
+          "name": "scheduledDate",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
@@ -737,24 +742,9 @@
           "notNull": true,
           "autoincrement": false
         },
-        "tier": {
-          "name": "tier",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "enum('pending','booked','completed','cancelled')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'pending'"
-        },
-        "focusAreas": {
-          "name": "focusAreas",
-          "type": "text",
+        "sessionType": {
+          "name": "sessionType",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -766,20 +756,13 @@
           "notNull": false,
           "autoincrement": false
         },
-        "sessionType": {
-          "name": "sessionType",
-          "type": "enum('video','phone','chat')",
+        "status": {
+          "name": "status",
+          "type": "enum('scheduled','completed','cancelled','no-show')",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false,
-          "default": "'video'"
-        },
-        "meetingLink": {
-          "name": "meetingLink",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
+          "default": "'scheduled'"
         },
         "createdAt": {
           "name": "createdAt",
@@ -800,102 +783,37 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "sessions_coachId_coaches_id_fk": {
+          "name": "sessions_coachId_coaches_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "coaches",
+          "columnsFrom": [
+            "coachId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "sessions_clientId_clients_id_fk": {
+          "name": "sessions_clientId_clients_id_fk",
+          "tableFrom": "sessions",
+          "tableTo": "clients",
+          "columnsFrom": [
+            "clientId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {
         "sessions_id": {
           "name": "sessions_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "subscriptions": {
-      "name": "subscriptions",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "stripeSubscriptionId": {
-          "name": "stripeSubscriptionId",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "tier": {
-          "name": "tier",
-          "type": "enum('basic','professional','enterprise')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "status": {
-          "name": "status",
-          "type": "enum('active','cancelled','past_due','trialing')",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "'active'"
-        },
-        "currentPeriodStart": {
-          "name": "currentPeriodStart",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "currentPeriodEnd": {
-          "name": "currentPeriodEnd",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "cancelAtPeriodEnd": {
-          "name": "cancelAtPeriodEnd",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "subscriptions_id": {
-          "name": "subscriptions_id",
           "columns": [
             "id"
           ]
@@ -944,18 +862,11 @@
         },
         "role": {
           "name": "role",
-          "type": "enum('user','coach','admin')",
+          "type": "enum('user','admin')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "'user'"
-        },
-        "tier": {
-          "name": "tier",
-          "type": "enum('basic','professional','enterprise')",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         },
         "createdAt": {
           "name": "createdAt",
