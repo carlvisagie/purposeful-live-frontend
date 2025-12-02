@@ -1507,3 +1507,41 @@
 - [ ] Integrate autism-specific AI Coach capabilities
 - [ ] Test with pilot families
 - [ ] Launch autism module
+
+
+## REMAINING FRONTEND WORK
+
+### Autism Module UI
+- [x] Fix AutismDashboard.tsx schema alignment
+- [x] Fix CreateAutismProfile.tsx field mapping
+- [ ] Create intervention management page
+- [ ] Create therapy session logging page
+- [ ] Create outcome tracking page
+- [x] Add autism module routes to App.tsx
+
+### Transformation Protocol UI
+- [ ] Implement missing identity router procedures (getTodayCheckin, createDailyCheckin)
+- [ ] Fix DailyCheckin.tsx to work with identity router
+- [ ] Create habit tracker page
+- [ ] Create identity dashboard page
+- [ ] Create micro-habits interface
+- [ ] Add transformation protocol routes to App.tsx
+
+### Calendly Integration
+- [ ] Add Calendly embed to IntroSession.tsx
+- [ ] Add Calendly embed to BookSessionNew.tsx
+- [ ] Configure Calendly event types in environment
+
+### Stripe Integration
+- [ ] Create Stripe products for each session tier
+- [ ] Add Stripe price IDs to environment
+- [ ] Implement session payment flow
+- [ ] Test payment completion
+
+### Testing & Deployment
+- [ ] Test autism module end-to-end
+- [ ] Test transformation protocol end-to-end
+- [ ] Test booking flow
+- [ ] Test payment flow
+- [ ] Final checkpoint
+- [ ] Deploy to Render

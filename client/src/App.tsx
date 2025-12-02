@@ -24,6 +24,8 @@ import CoachDashboard from "./pages/CoachDashboard";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import AICoaching from "./pages/AICoaching";
 import IntroSession from "./pages/IntroSession";
+import AutismDashboard from "./pages/AutismDashboard";
+import CreateAutismProfile from "./pages/CreateAutismProfile";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -47,6 +49,8 @@ function Router() {
       <Route path="/emotions" component={EmotionTracker} />
       <Route path="/insights" component={InsightsDashboard} />
       <Route path="/coach/dashboard" component={CoachDashboard} />
+      <Route path="/autism" component={AutismDashboard} />
+      <Route path="/autism/create-profile" component={CreateAutismProfile} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
