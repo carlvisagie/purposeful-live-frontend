@@ -105,7 +105,7 @@ export type InsertRecommendationFeedback = typeof recommendationFeedback.$inferI
  * Outcome Tracking
  * Did the coaching actually improve their life?
  */
-export const outcomeTracking = mysqlTable("outcomeTracking", {
+export const adaptiveOutcomeTracking = mysqlTable("adaptiveOutcomeTracking", {
   id: int("id").autoincrement().primaryKey(),
   clientId: int("clientId").notNull().references(() => clients.id),
   
@@ -139,8 +139,8 @@ export const outcomeTracking = mysqlTable("outcomeTracking", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
-export type OutcomeTracking = typeof outcomeTracking.$inferSelect;
-export type InsertOutcomeTracking = typeof outcomeTracking.$inferInsert;
+export type AdaptiveOutcomeTracking = typeof adaptiveOutcomeTracking.$inferSelect;
+export type InsertAdaptiveOutcomeTracking = typeof adaptiveOutcomeTracking.$inferInsert;
 
 /**
  * Trend Detection

@@ -64,7 +64,7 @@ export const autismRouter = router({
         updatedAt: new Date(),
       });
 
-      return { success: true, profileId: profile.id };
+      return { success: true };
     }),
 
   getMyProfiles: protectedProcedure.query(async ({ ctx }) => {
@@ -121,7 +121,7 @@ export const autismRouter = router({
         tier3Interventions: z.array(z.string()).optional(),
         tier4Interventions: z.array(z.string()).optional(),
         currentPhase: z.enum(["foundation", "biomedical", "behavioral", "advanced"]),
-        providerDirectory: z.record(z.string()).optional(),
+        providerDirectory: z.record(z.string(), z.any()).optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -138,7 +138,7 @@ export const autismRouter = router({
         updatedAt: new Date(),
       });
 
-      return { success: true, planId: plan.id };
+      return { success: true };
     }),
 
   getInterventionPlan: protectedProcedure
@@ -187,7 +187,7 @@ export const autismRouter = router({
         updatedAt: new Date(),
       });
 
-      return { success: true, supplementId: supplement.id };
+      return { success: true };
     }),
 
   updateSupplementTracking: protectedProcedure
@@ -248,7 +248,7 @@ export const autismRouter = router({
         updatedAt: new Date(),
       });
 
-      return { success: true, dietId: diet.id };
+      return { success: true };
     }),
 
   updateDietTracking: protectedProcedure
@@ -256,8 +256,8 @@ export const autismRouter = router({
       z.object({
         dietId: z.number(),
         adherence: z.number().min(0).max(100).optional(),
-        giSymptomChanges: z.record(z.string()).optional(),
-        behaviorChanges: z.record(z.string()).optional(),
+        giSymptomChanges: z.record(z.string(), z.any()).optional(),
+        behaviorChanges: z.record(z.string(), z.any()).optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -302,7 +302,7 @@ export const autismRouter = router({
         sessionDate: z.date(),
         duration: z.number(),
         goalsAddressed: z.array(z.string()).optional(),
-        progress: z.record(z.string()).optional(),
+        progress: z.record(z.string(), z.any()).optional(),
         parentFeedback: z.string().optional(),
       })
     )
@@ -318,7 +318,7 @@ export const autismRouter = router({
         createdAt: new Date(),
       });
 
-      return { success: true, sessionId: session.id };
+      return { success: true };
     }),
 
   getTherapySessions: protectedProcedure
@@ -372,7 +372,7 @@ export const autismRouter = router({
         createdAt: new Date(),
       });
 
-      return { success: true, outcomeId: outcome.id };
+      return { success: true };
     }),
 
   getOutcomes: protectedProcedure

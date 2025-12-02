@@ -10,7 +10,7 @@ import {
   techniqueEffectiveness,
   clientPatterns,
   recommendationFeedback,
-  outcomeTracking,
+  adaptiveOutcomeTracking,
   trendDetection,
   strategyAdjustments,
 } from "../../drizzle/schema";
@@ -158,8 +158,8 @@ export const adaptiveLearningRouter = router({
       // Check if outcome tracking exists
       const existing = await db
         .select()
-        .from(outcomeTracking)
-        .where(eq(outcomeTracking.clientId, clientId))
+        .from(adaptiveOutcomeTracking)
+        .where(eq(adaptiveOutcomeTracking.clientId, clientId))
         .limit(1);
 
       if (existing.length > 0) {
@@ -172,7 +172,7 @@ export const adaptiveLearningRouter = router({
         const daysInCoaching = Math.floor((Date.now() - baselineDate.getTime()) / (1000 * 60 * 60 * 24));
 
         await db
-          .update(outcomeTracking)
+          .update(adaptiveOutcomeTracking)
           .set({
             ...updates,
             goalsAchieved: updates.goalsAchieved ? JSON.stringify(updates.goalsAchieved) : record.goalsAchieved,
@@ -180,10 +180,10 @@ export const adaptiveLearningRouter = router({
             functioningImprovement,
             daysInCoaching,
           })
-          .where(eq(outcomeTracking.id, record.id));
+          .where(eq(adaptiveOutcomeTracking.id, record.id));
       } else {
         // Create baseline
-        await db.insert(outcomeTracking).values({
+        await db.insert(adaptiveOutcomeTracking).values({
           clientId,
           baselineDate: new Date(),
           baselineEmotionalState: updates.currentEmotionalState,
@@ -208,8 +208,8 @@ export const adaptiveLearningRouter = router({
     .query(async ({ input }) => {
       const outcomes = await db
         .select()
-        .from(outcomeTracking)
-        .where(eq(outcomeTracking.clientId, input.clientId))
+        .from(adaptiveOutcomeTracking)
+        .where(eq(adaptiveOutcomeTracking.clientId, input.clientId))
         .limit(1);
 
       return { outcome: outcomes[0] || null };
@@ -279,7 +279,7 @@ export const adaptiveLearningRouter = router({
 
     const [outcomeCount] = await db
       .select({ count: sql<number>`count(*)` })
-      .from(outcomeTracking);
+      .from(adaptiveOutcomeTracking);
 
     const [trendCount] = await db
       .select({ count: sql<number>`count(*)` })
