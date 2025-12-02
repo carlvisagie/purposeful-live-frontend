@@ -6,6 +6,9 @@ export * from "./identitySchema";
 // Export adaptive learning schema tables
 export * from "./adaptiveLearningSchema";
 
+// Export autism transformation module schema tables
+export * from "./autismSchema";
+
 /**
  * Core user table backing auth flow.
  * Extend this file with additional tables as your product grows.
